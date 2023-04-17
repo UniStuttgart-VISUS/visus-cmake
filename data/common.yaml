@@ -1,1 +1,6 @@
---- {}
+---
+cmake::base_url: 'https://github.com/Kitware/CMake/releases/download/'
+cmake::build_dependencies:
+  - gcc
+cmake::install_dir: '/usr'
+cmake::source_dir: '/usr/local/src'
