@@ -10,16 +10,22 @@
 # @param build_dependencies A list of packages that need to be installed in
 #                           order to successfully build CMake. These
 #                           dependencies should be specified via Hiera.
+# @param source_type The source_type parameter determines the type of the
+#                    installation. If it is 'sh', the installer script will be
+#                    downloaded and installed. Otherwise, it is assumed that the
+#                    source URL points to a source archive that needs to be
+#                    built.
 # @param version The version of CMake that should be installed. 
 # @param override_url If set, forces download from the specified URL, bypassing
 #                     any of the automatic guess work.
 #
 # @author Christoph Müller
 class cmake(
-        String $source_dir,
-        String $install_dir,
-        String $base_url,
-        Array[String] $build_dependencies,
+        String $source_dir = '/usr/local/src',
+        String $install_dir = '/usr',
+        String $base_url = 'https://github.com/Kitware/CMake/releases/download/',
+        String $source_type = 'sh',
+        Array[String] $build_dependencies = [ 'gcc' ],
         String $version,
         Optional[String] $override_url = undef
         ) {
@@ -31,26 +37,32 @@ class cmake(
     $url = if $override_url {
         $override_url
     } else {
-        "${base_url}/v${version}/cmake-${version}-linux-${facts['os']['architecture']}.sh"
+        "${base_url}/v${version}/cmake-${version}-linux-${facts['os']['architecture']}.${source_type}"
     }
 
-    # Resolve the local source file and directory.
+    # Resolve the local source file.
     $src_file = "${source_dir}/${basename($url)}"
-    #$src_dir = "${source_dir}/${basename($url, '.*')}"
 
-  notify { ">>>>>>>>>>>>>>>>>>>${src_file}": }
+    if $source_type == 'sh' {
+        # Download the installer script.
+        archive { $src_file:
+            source => $url,
+            user => 'root',
+            group => 'root',
+        }
 
-    # Download and extract the installer script.
-    archive { $src_file:
-        source => $url,
-        user => 'root',
-        group => 'root',
-    }
+        # Run the installer.
+        ~> cmake::install { "${title}-${version}":
+            script => $src_file,
+            prefix => $install_dir
+        }
 
-    # Run the installer.
-    ~> cmake::install { "${title}-${version}":
-        script => $src_file,
-        prefix => $install_dir
+    } else {
+      $src_dir = "${source_dir}/${basename($url, '.*')}"
+
+      # Download and extract the source archive.
+
+      notify { "TODO >>>>>>>>>>>>>>>>>>>${src_file}": }
     }
 
 }
