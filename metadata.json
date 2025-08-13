@@ -19,6 +19,7 @@
       "operatingsystem": "OracleLinux",
       "operatingsystemrelease": [
         "7",
+        "8",
         "9"
       ]
     },
@@ -33,12 +34,6 @@
       "operatingsystem": "Scientific",
       "operatingsystemrelease": [
         "7"
-      ]
-    },
-    {
-      "operatingsystem": "Fedora",
-      "operatingsystemrelease": [
-        "35"
       ]
     }
   ],
