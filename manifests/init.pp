@@ -14,7 +14,8 @@
 #                    installation. If it is 'sh', the installer script will be
 #                    downloaded and installed. Otherwise, it is assumed that the
 #                    source URL points to a source archive that needs to be
-#                    built.
+#                    built. For Linux machines, you would typically use 'tar.gz'
+#                    in this case.
 # @param version The version of CMake that should be installed. 
 # @param override_url If set, forces download from the specified URL, bypassing
 #                     any of the automatic guess work.
@@ -36,8 +37,10 @@ class cmake(
     # Resolve the actual remote location of the sources.
     $url = if $override_url {
         $override_url
-    } else {
+    } elsif $source_type == 'sh' {
         "${base_url}/v${version}/cmake-${version}-linux-${facts['os']['architecture']}.${source_type}"
+    } else {
+        "${base_url}/v${version}/cmake-${version}.${source_type}"
     }
 
     # Resolve the local source file.
@@ -45,6 +48,7 @@ class cmake(
 
     if $source_type == 'sh' {
         # Download the installer script.
+        #notify { "Download cmake installer ${url}": }
         archive { $src_file:
             source => $url,
             user => 'root',
@@ -58,11 +62,25 @@ class cmake(
         }
 
     } else {
-      $src_dir = "${source_dir}/${basename($url, '.*')}"
+        $src_dir = "${source_dir}/${basename(basename($url, '.*'), '.*')}"
 
-      # Download and extract the source archive.
+        notify { ">>>> ${url} >>>> ${src_dir}": }
 
-      notify { "TODO >>>>>>>>>>>>>>>>>>>${src_file}": }
+
+        # Download and extract the source archive.
+        archive { $src_file:
+            source => $url,
+            user => 'root',
+            group => 'root',
+            extract => true,
+            extract_path => $source_dir,
+            cleanup => false,
+        }
+
+        # Build and install the source.
+        ~> cmake::build { "${title}-${version}":
+            src_dir => $src_dir,
+            prefix => $install_dir
+        }     
     }
-
 }
