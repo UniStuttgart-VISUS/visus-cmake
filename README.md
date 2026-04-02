@@ -16,20 +16,6 @@ Installs cmake from Kitware's binary distribution or by building it from source.
 This module allows for installing newer versions of CMake than the ones that are distributed via the package manager of Linux distributions. The module can retrieve either the pre-built binaries from [Kitware's GitHub repository](https://github.com/Kitware/CMake/) or build CMake from source alltogether. In the latter case, tools for doing so like gcc must be installed on the target system.
 
 ## Setup
-
-### What cmake affects **OPTIONAL**
-If it's obvious what your module touches, you can skip this section. For
-example, folks can probably figure out that your mysql_instance module affects
-their MySQL instances.
-
-If there's more that they should know about, though, this is the place to
-mention:
-
-* Files, packages, services, or operations that the module will alter, impact,
-  or execute.
-* Dependencies that your module automatically installs.
-* Warnings or other important notices.
-
 ### Setup Requirements **OPTIONAL**
 If your module requires anything extra before setting up (pluginsync enabled,
 another module, etc.), mention it here.
